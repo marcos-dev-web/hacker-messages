@@ -1,0 +1,153 @@
+.main {
+  width: 100%;
+  height: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  border: 1px solid #333;
+  border-top: 0;
+  border-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  flex: 1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+.messages {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.messages > ul {
+  width: 100%;
+  overflow-y: auto;
+  max-height: calc(100vh - 50px);
+}
+
+.messages > ul > div {
+  width: 100%;
+  color: white;
+  background: #222;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #333;
+}
+
+.messages ul > div > p {
+  color: springgreen;
+  font-family: monospace;
+}
+
+.contacts {
+  border-left: 1px solid #333;
+  overflow-y: auto;
+  height: 100vh;
+  padding-bottom: 20px;
+}
+
+.contacts > h1 {
+  width: 100%;
+  height: 50px;
+  padding-top: 0.75rem;
+  background: #222;
+  border-bottom: 1px solid #333;
+  color: white;
+  text-align: center;
+  font-size: 1.5rem;
+  font-family: monospace;
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.contacts > li {
+  width: 100%;
+  color: white;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  padding: 0 10px;
+}
+
+.contacts > li:not(:last-child) {
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.contacts > li > span {
+  color: yellowgreen;
+  font-size: 1rem;
+}
+
+.input {
+  width: 100%;
+  align-self: center;
+  background: #111;
+  font-size: 1rem;
+  border: 0;
+  border: 1px solid #222;
+  border-right: 0;
+  border-bottom: 0;
+  color: springgreen;
+  height: 50px;
+  padding: 0 10px;
+  outline: 0;
+}
+
+.input:focus {
+  border-top-color: green;
+}
+
+.li {
+  width: 100%;
+  color: white;
+  display: flex;
+  align-items: center;
+  margin: 5px auto;
+  font-size: 1rem;
+  font-family: monospace;
+  line-height: 1.2rem;
+}
+
+.li > span:first-child {
+  color: yellow;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.li > span:first-child > span {
+  color: springgreen;
+}
+
+.li > p {
+  margin-left: 1rem;
+  font-size: 0.9rem;
+  color: springgreen;
+  flex: 1;
+}
+
+.li > span:last-child {
+  font-size: 0.8rem;
+  color: #c4c4c4;
+  margin-right: 5px;
+}
+
+.me {
+  color: white !important;
+}
+
+.bottom {
+  display: block;
+  margin-top: 20px;
+}
