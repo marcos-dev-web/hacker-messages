@@ -62,8 +62,8 @@ export function MessagesProvider({ children }) {
     setMessages([]);
   }
 
-  function newMessage(text = "") {
-    if (to) {
+  function newMessage(text = "", info=false) {
+    if (to && !info) {
       const payload = {
         id: socket.id,
         to: to.replace('user@', ''),
@@ -85,7 +85,22 @@ export function MessagesProvider({ children }) {
 
       setMessages((state) => [...state, message]);
       return true;
+    } else if (info) {
+      const date = new Date();
+      const hour = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+
+      const message = {
+        hour: `${hour}:${minutes}`,
+        info: true,
+        id: new Date(),
+        text,
+      };
+
+      setMessages(state => [...state, message])
+      return true;
     }
+
     return false;
   }
 

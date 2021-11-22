@@ -22,7 +22,7 @@ export const Chat = () => {
     'set_id': args => {
       const result = updateTo(args[0]);
       if (result) {
-        alert(`You select id: ${args[0]}`);
+        newMessage(`You select id: ${args[0]}`, true);
         return true;
       }
 
@@ -68,13 +68,20 @@ export const Chat = () => {
             </div>
             {
               messages.map(message => (
-                <li key={message.id} className={styles.li}>
-                  <span className={!message.user ? styles.me : undefined}><span>@</span>{message.user || "me"}<span>:</span></span>
-                  <p>{message.text}</p>
-                  <span>
-                    {message.hour}
-                  </span>
-                </li>
+                message.info ? (
+                  <li key={message.id} className={styles.info}>
+                    <p>{message.text}</p>
+                    <span>{message.hour}</span>
+                  </li>
+                ) : (
+                  <li key={message.id} className={styles.li}>
+                    <span className={!message.user ? styles.me : undefined}><span>@</span>{message.user || "me"}<span>:</span></span>
+                    <p>{message.text}</p>
+                    <span>
+                      {message.hour}
+                    </span>
+                  </li>
+                )
               ))
             }
             <span ref={down} className={styles.bottom} />
