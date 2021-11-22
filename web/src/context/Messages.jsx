@@ -6,7 +6,7 @@ const initial_context = {
   messages: [],
   contacts: [],
   to: null,
-  setTo: (to = "") => to,
+  updateTo: (to = "") => to,
   newMessage: (text = "") => text,
   clearMessages: () => { },
 };
@@ -50,6 +50,14 @@ export function MessagesProvider({ children }) {
     };
   }, []);
 
+  function updateTo(id="") {
+    if (contacts.includes(id.replace('user@', ''))) {
+      setTo(id.replace('user@', ''));
+      return true;
+    }
+    return false;
+  }
+
   function clearMessages() {
     setMessages([]);
   }
@@ -83,7 +91,7 @@ export function MessagesProvider({ children }) {
 
   return (
     <MessagesContext.Provider
-      value={{ messages, newMessage, setTo, to, contacts, clearMessages }}
+      value={{ messages, newMessage, updateTo, to, contacts, clearMessages }}
     >
       {children}
     </MessagesContext.Provider>

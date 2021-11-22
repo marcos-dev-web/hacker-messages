@@ -7,7 +7,7 @@ import { getCommand } from '../../utils/getCommand';
 import styles from './styles.module.css';
 
 export const Chat = () => {
-  const { messages, newMessage, to, setTo, contacts, clearMessages } = useMessages();
+  const { messages, newMessage, to, updateTo, contacts, clearMessages } = useMessages();
 
   const [text, setText] = useState('');
 
@@ -20,35 +20,32 @@ export const Chat = () => {
       return true;
     },
     'set_id': args => {
-      setTo(args[0]);
-      alert(`You select id: ${args[0]}`);
+      const result = updateTo(args[0]);
+      if (result) {
+        alert(`You select id: ${args[0]}`);
+        return true;
+      }
 
-      return true;
+      alert(`${args[0]} is not a contact`);
+      return false;
     },
   }
 
   function submit() {
-    if (to && text.trim().length > 0) {
-      const [command, args] = getCommand(text);
+    const [command, args] = getCommand(text);
 
-      if (command) {
-        const result = commands?.[command]?.(args);
+    if (command) {
+      const result = commands?.[command]?.(args);
 
-        if (result) {
-          setText('');
-          down.current.scrollIntoView(true);
-        }
-      } else {
-        const result = newMessage(text);
-        if (result) {
-          setText('');
-          down.current.scrollIntoView(true);
-        }
+      if (result) {
+        setText('');
+        down.current.scrollIntoView(true);
       }
     } else {
-      if (text.trim().length > 0) {
-        setTo(text);
+      const result = newMessage(text);
+      if (result) {
         setText('');
+        down.current.scrollIntoView(true);
       }
     }
   }
@@ -58,13 +55,17 @@ export const Chat = () => {
       <div className={styles.center}>
         <div className={styles.messages}>
           <ul>
-            {!to && (
-              <div>
+            <div>
+              {!to ? (
                 <p>
-                  TYPE THE USER ID THAT YOU WANTS TO SEND MESSAGES...
+                  <span>!set_id user_id;</span> // to sent message
                 </p>
-              </div>
-            )}
+              ) : (
+                <p>
+                  {to}
+                </p>
+              )}
+            </div>
             {
               messages.map(message => (
                 <li key={message.id} className={styles.li}>
@@ -81,7 +82,7 @@ export const Chat = () => {
           <input
             className={styles.input}
             type="text"
-            placeholder={to ? "type..." : "TYPE THE USER ID THAT YOU WANT TO SEND MESSAGES..."}
+            placeholder="type..."
             value={text}
             onChange={e => setText(String(e.target.value))}
             onKeyDown={e => {

@@ -41,7 +41,7 @@ io.on('connection', socket => {
 
   socket.on('message', data => {
     if (getListOfSockets(io).includes(data.id)) {
-      logSocket(`FROM: ${data.id}, TO: ${socket.id} - ${data.text}`, 'message', '>');
+      logSocket(`FROM: ${data.id}, TO: ${socket.id} - ${data.text}`, 'message', '@');
       io.to(data.to).emit('message', {
         from: data.id,
         message: data.text

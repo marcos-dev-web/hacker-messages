@@ -44,8 +44,17 @@
 }
 
 .messages ul > div > p {
-  color: springgreen;
   font-family: monospace;
+  font-style: oblique;
+  color: #888;
+}
+
+.messages > ul > div > p > span {
+  background: #333;
+  padding: 2px 5px;
+  border-radius: 5px;
+  font-style: normal;
+  color: springgreen;
 }
 
 .contacts {
