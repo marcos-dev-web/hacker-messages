@@ -25,7 +25,9 @@ export function getCommand(command="") {
 
     if (fullArgs.length > 1) {
       for (let i = 1; i < fullArgs.length; i++) {
-        args.push(fullArgs[i]);
+        if (fullArgs[i].trim().length > 0) {
+          args.push(fullArgs[i]);
+        }
       }
     }
 

@@ -51,6 +51,10 @@ export function MessagesProvider({ children }) {
   }, []);
 
   function updateTo(id="") {
+    if (id === null) {
+      setTo(null);
+      return true;
+    }
     if (contacts.includes(id.replace('user@', ''))) {
       setTo(id.replace('user@', ''));
       return true;
@@ -63,6 +67,9 @@ export function MessagesProvider({ children }) {
   }
 
   function newMessage(text = "", info=false) {
+    if (!text.trim().length) {
+      return false;
+    }
     if (to && !info) {
       const payload = {
         id: socket.id,

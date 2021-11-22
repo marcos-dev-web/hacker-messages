@@ -8,6 +8,7 @@ import styles from './styles.module.css';
 
 export const Chat = () => {
   const { messages, newMessage, to, updateTo, contacts, clearMessages } = useMessages();
+  const [showCommands, setShowCommands] = useState(false);
 
   const [text, setText] = useState('');
 
@@ -29,7 +30,34 @@ export const Chat = () => {
       alert(`${args[0]} is not a contact`);
       return false;
     },
+    'disconnect_user': () => {
+      updateTo(null);
+      return true;
+    },
+    'commands': () => {
+      setShowCommands(true);
+      return true;
+    }
   }
+
+  const listCommands = [
+    {
+      name: 'clear',
+      args: []
+    },
+    {
+      name: 'commands',
+      args: []
+    },
+    {
+      name: 'disconnect_user',
+      args: []
+    },
+    {
+      name: 'set_id',
+      args: ['user@user_id'],
+    },
+  ];
 
   function submit() {
     const [command, args] = getCommand(text);
@@ -52,13 +80,27 @@ export const Chat = () => {
 
   return (
     <main className={styles.main}>
+      {showCommands && (
+        <div className={styles.commands} onClick={() => {
+          setShowCommands(false);
+        }}>
+          <h1>Commands</h1>
+          <div>
+            {listCommands.map((command, i) => (
+              <p key={i}>
+                !{command.name}{command.args.map(arg => ` ${arg}`)};
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
       <div className={styles.center}>
         <div className={styles.messages}>
           <ul>
             <div>
               {!to ? (
                 <p>
-                  <span>!set_id user_id;</span> // to sent message
+                  <span>!commands;</span> {"// to see all commands"}
                 </p>
               ) : (
                 <p>
