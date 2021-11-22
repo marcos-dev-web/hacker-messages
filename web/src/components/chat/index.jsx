@@ -2,21 +2,42 @@ import React, { useState, useRef } from 'react';
 
 import { useMessages } from '../../context/Messages';
 
+import { getCommand } from '../../utils/getCommand';
+
 import styles from './styles.module.css';
 
 export const Chat = () => {
-  const { messages, newMessage, to, setTo, contacts } = useMessages();
+  const { messages, newMessage, to, setTo, contacts, clearMessages } = useMessages();
 
   const [text, setText] = useState('');
 
   const down = useRef();
 
+  const commands = {
+    'clear': () => {
+      clearMessages();
+
+      return true;
+    }
+  }
+
   function submit() {
     if (to && text.trim().length > 0) {
-      const result = newMessage(text);
-      if (result) {
-        setText('');
-        down.current.scrollIntoView(true);
+      const command = getCommand(text);
+
+      if (command) {
+        const result = commands?.[command]?.();
+
+        if (result) {
+          setText('');
+          down.current.scrollIntoView(true);
+        }
+      } else {
+        const result = newMessage(text);
+        if (result) {
+          setText('');
+          down.current.scrollIntoView(true);
+        }
       }
     } else {
       if (text.trim().length > 0) {
@@ -41,7 +62,7 @@ export const Chat = () => {
             {
               messages.map(message => (
                 <li key={message.id} className={styles.li}>
-                  <span className={!message.user && styles.me}><span>@</span>{message.user || "me"}<span>:</span></span>
+                  <span className={!message.user ? styles.me : undefined}><span>@</span>{message.user || "me"}<span>:</span></span>
                   <p>{message.text}</p>
                   <span>
                     {message.hour}
@@ -67,7 +88,7 @@ export const Chat = () => {
         <ul className={styles.contacts}>
           <h1>Users</h1>
           {contacts.map(contact => (
-            <li key={contact.id}>{contact.id}<span>@</span>{contact.name}</li>
+            <li key={contact}>user<span>@</span>{contact}</li>
           ))}
         </ul>
       </div>
