@@ -5,9 +5,10 @@
 export function getCommand(command="") {
     const str = command.trim();
     let commandLine = "";
+    let args = [];
 
     if (str[0] !== '!') {
-        return null;
+        return [null];
     }
 
     let fullCommand = str.slice(1);
@@ -20,5 +21,13 @@ export function getCommand(command="") {
         }
     }
 
-    return commandLine;
+    const fullArgs = commandLine.split(' ');
+
+    if (fullArgs.length > 1) {
+      for (let i = 1; i < fullArgs.length; i++) {
+        args.push(fullArgs[i]);
+      }
+    }
+
+    return [commandLine.split(' ')[0], args];
 }

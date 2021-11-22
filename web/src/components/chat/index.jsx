@@ -18,15 +18,21 @@ export const Chat = () => {
       clearMessages();
 
       return true;
-    }
+    },
+    'set_id': args => {
+      setTo(args[0]);
+      alert(`You select id: ${args[0]}`);
+
+      return true;
+    },
   }
 
   function submit() {
     if (to && text.trim().length > 0) {
-      const command = getCommand(text);
+      const [command, args] = getCommand(text);
 
       if (command) {
-        const result = commands?.[command]?.();
+        const result = commands?.[command]?.(args);
 
         if (result) {
           setText('');
