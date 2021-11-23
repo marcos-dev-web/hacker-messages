@@ -1,6 +1,6 @@
 import React, { useState, useContext, createContext, useEffect } from "react";
 
-import io from 'socket.io-client';
+import io from "socket.io-client";
 
 const initial_context = {
   messages: [],
@@ -8,7 +8,8 @@ const initial_context = {
   to: null,
   updateTo: (to = "") => to,
   newMessage: (text = "") => text,
-  clearMessages: () => { },
+  clearMessages: () => {},
+  updateName: (name) => name,
 };
 
 const MessagesContext = createContext(initial_context);
@@ -20,27 +21,33 @@ export function MessagesProvider({ children }) {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const s = io('http://localhost:8000', { transports: ['websocket'] });
+    const s = io("http://localhost:8000", { transports: ["websocket"] });
     setSocket(s);
-    s.on('users/all', data => {
+    s.on("users/all", (data) => {
       if (data) {
-        const ctts = data.filter(c => c !== s.id);
+        const ctts = data.filter((c) => c.id !== s.id);
         setContacts(ctts);
       }
     });
 
-    s.on('message', data => {
+    s.on("message", (data) => {
       const date = new Date();
+
       const hour = String(date.getHours()).padStart(2, "0");
       const minutes = String(date.getMinutes()).padStart(2, "0");
 
-      setMessages(state => ([...state, {
-        id: new Date(),
-        user: data.from,
-        text: data.message,
-        hour: `${hour}:${minutes}`
-      }]));
-    })
+      console.log(contacts);
+      console.log(data);
+      setMessages((state) => [
+        ...state,
+        {
+          id: new Date(),
+          user: data.from,
+          text: data.message,
+          hour: `${hour}:${minutes}`,
+        },
+      ]);
+    });
 
     return () => {
       setTo(null);
@@ -50,13 +57,18 @@ export function MessagesProvider({ children }) {
     };
   }, []);
 
-  function updateTo(id="") {
+  function updateName(name = "") {
+    socket.emit("change_name", name);
+  }
+
+  function updateTo(id = "") {
     if (id === null) {
       setTo(null);
       return true;
     }
-    if (contacts.includes(id.replace('user@', ''))) {
-      setTo(id.replace('user@', ''));
+
+    if (contacts.find((c) => c.id === id.replace(/[\d\s\w]+@/, ""))) {
+      setTo(id.replace(/[\d\s\w]+@/, ""));
       return true;
     }
     return false;
@@ -66,18 +78,18 @@ export function MessagesProvider({ children }) {
     setMessages([]);
   }
 
-  function newMessage(text = "", info=false) {
+  function newMessage(text = "", info = false) {
     if (!text.trim().length) {
       return false;
     }
     if (to && !info) {
       const payload = {
         id: socket.id,
-        to: to.replace('user@', ''),
+        to,
         text,
-      }
+      };
 
-      socket.emit('message', payload);
+      socket.emit("message", payload);
 
       const date = new Date();
       const hour = String(date.getHours()).padStart(2, "0");
@@ -104,7 +116,7 @@ export function MessagesProvider({ children }) {
         text,
       };
 
-      setMessages(state => [...state, message])
+      setMessages((state) => [...state, message]);
       return true;
     }
 
@@ -113,7 +125,15 @@ export function MessagesProvider({ children }) {
 
   return (
     <MessagesContext.Provider
-      value={{ messages, newMessage, updateTo, to, contacts, clearMessages }}
+      value={{
+        messages,
+        newMessage,
+        updateTo,
+        to,
+        contacts,
+        clearMessages,
+        updateName,
+      }}
     >
       {children}
     </MessagesContext.Provider>

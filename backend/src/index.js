@@ -1,57 +1,53 @@
-const express = require('express');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cors = require('cors');
-const http = require('http');
-const { Server } = require('socket.io');
+const express = require("express");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+
+const { logSocket } = require("./utils/logSocket");
+const { getListOfSockets } = require("./utils/getListOfSockets");
 
 const app = express();
 
 app.use(helmet());
-app.use(morgan('dev'));
-app.use(cors({
-  origin: '*',
-}));
+app.use(morgan("dev"));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 const server = http.createServer(app);
 const io = new Server(server);
 
-function getListOfSockets(ioS) {
-  return [...ioS.sockets.sockets].map(s => s[0]);
-}
+io.on("connection", (socket) => {
+  io.emit("users/all", getListOfSockets(io));
 
-/**
- * @param {("new"|"disconnect"|"message")} type type of log
- */
-function logSocket(message="", type="", symbol="+") {
-  switch (type) {
-    case "disconnect":
-      return console.log(`\x1b[1;31m[\x1b[1;37m${symbol}\x1b[1;31m] \x1b[1;37mUSER DISCONNECTED: \x1b[1;37m${message}\x1b[0m`);
-    case "new":
-      return console.log(`\x1b[1;32m[\x1b[1;37m${symbol}\x1b[1;32m] \x1b[1;37mUSER CONNECTED: \x1b[1;36m${message}\x1b[0m`);
-    case "message":
-      return console.log(`\x1b[1;32m[\x1b[1;37m${symbol}\x1b[1;32m] \x1b[1;37mMESSAGE: \x1b[1;36m${message}\x1b[0m`);
-  }
-}
+  logSocket(socket.id, "new");
 
-io.on('connection', socket => {
-  io.emit('users/all', getListOfSockets(io));
+  socket.on('change_name', name => {
+    socket['name'] = name;
+    io.emit("users/all", getListOfSockets(io));
+  });
 
-  logSocket(socket.id, 'new');
-
-  socket.on('message', data => {
-    if (getListOfSockets(io).includes(data.id)) {
-      logSocket(`FROM: ${data.id}, TO: ${socket.id} - ${data.text}`, 'message', '@');
-      io.to(data.to).emit('message', {
+  socket.on("message", (data) => {
+    if (getListOfSockets(io).find(s => s.id === data.id)) {
+      logSocket(
+        `FROM: ${data.id}, TO: ${socket.id} - ${data.text}`,
+        "message",
+        "@"
+      );
+      io.to(data.to).emit("message", {
         from: data.id,
-        message: data.text
+        message: data.text,
       });
     }
-  })
+  });
 
-  socket.on('disconnect', () => {
-    io.emit('users/all', );
-    logSocket(socket.id, 'disconnect', '-');
+  socket.on("disconnect", () => {
+    logSocket(socket.id, "disconnect", "-");
+    io.emit("users/all", getListOfSockets(io));
   });
 });
 
@@ -60,4 +56,3 @@ const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`\x1b[1;32mLISTENING AT PORT ${PORT}\x1b[0m`);
 });
-
